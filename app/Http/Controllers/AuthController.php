@@ -38,13 +38,12 @@ class AuthController extends Controller
         $array = ['error' => ''];
 
         $creds = $request->only('email', 'password');
-        if(Auth::attempt($creds)){
-            $user = User::where('email', $creds['email'])->first();
-            $item = time().random_int(0,9999);
-            $token = $user->createToken($item)->plainTextToken;
+        $token = Auth::attempt($creds);
+
+        if($token){
             $array['token'] = $token;
         }else{
-            $array['error'] = 'E-mail e/ou senha inválido(s)';
+            $array['error'] = 'E-mail e/ou senha incorreto';
         }
 
         return $array;
@@ -54,14 +53,17 @@ class AuthController extends Controller
     {
         $array = ['error' => ''];
 
-        //O Objeto do usuário já vem no request com base no Token enviado
-        $user = $request->user();
+        Auth::logout();
 
-        //Revoga TODOS os tokens
-        //$user->tokens()->delete();
+        return $array;
+    }
 
-        //Revoga o token ATUAL
-        $user->currentAccessToken()->delete();
+    public function me()
+    {
+        $array = ['error' => ''];
+
+        $user = Auth::user();
+        $array['email'] = $user->email;
 
         return $array;
     }

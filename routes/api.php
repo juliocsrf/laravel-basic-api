@@ -9,13 +9,14 @@ Route::get('/ping', function (){
     return ['pong' => true];
 });
 
-Route::get('/unauthenticated', function(){
+Route::get('/invalid-token', function(){
     return ['error' => 'Invalid token'];
 })->name('login');
 
 Route::post('/user', [AuthController::class, 'create']);
-Route::middleware('auth:sanctum')->get('/auth/logout', [AuthController::class, 'logout']);
-Route::post('/auth', [AuthController::class, 'login']);
+Route::post('/auth/login', [AuthController::class, 'login']);
+Route::middleware('auth:api')->post('/auth/logout', [AuthController::class, 'logout']);
+Route::middleware('auth:api')->get('auth/me', [AuthController::class, 'me']);
 
 Route::post('/todo', [ApiController::class, 'createTodo']);
 Route::get('/todos', [ApiController::class, 'readAllTodos']);
